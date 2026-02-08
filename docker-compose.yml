@@ -19,3 +19,4 @@ services:
       - ./workflows:/files/workflows
       - ./sources:/sources
       - ./news:/news
+      - ./scripts:/scripts:ro

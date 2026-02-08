@@ -1,0 +1,88 @@
+{
+  "name": "News V1 - Fetch Scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 6,
+              "unit": "hours"
+            }
+          ]
+        }
+      },
+      "id": "cron-fast",
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [220, 220]
+    },
+    {
+      "parameters": {
+        "command": "node /scripts/news_pipeline.mjs fetch --source arxiv-cscl,arxiv-cslg"
+      },
+      "id": "fetch-arxiv",
+      "name": "Fetch ArXiv",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [520, 220]
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyDay",
+              "hour": 7,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "id": "cron-daily",
+      "name": "Every Day",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [220, 420]
+    },
+    {
+      "parameters": {
+        "command": "node /scripts/news_pipeline.mjs fetch --source openai-blog,huggingface-blog,importai,ai-snake-oil,gary-marcus,kdnuggets,towards-ai,marktechpost"
+      },
+      "id": "fetch-daily",
+      "name": "Fetch Daily Sources",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [520, 420]
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "Fetch ArXiv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every Day": {
+      "main": [
+        [
+          {
+            "node": "Fetch Daily Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

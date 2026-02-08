@@ -1,0 +1,107 @@
+{
+  "name": "News V1 - Mark Read (Webhook)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "news-mark-read",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-in",
+      "name": "Mark Read Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 280]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nconst raw = body.ids ?? body.id ?? '';\nconst ids = Array.isArray(raw) ? raw.join(',') : String(raw);\nif (!ids.trim()) {\n  throw new Error('Provide id or ids in request body');\n}\nreturn [{ json: { ids } }];"
+      },
+      "id": "normalize-ids",
+      "name": "Normalize IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 280]
+    },
+    {
+      "parameters": {
+        "command": "={{ 'node /scripts/news_pipeline.mjs mark-read --id ' + $json.ids }}"
+      },
+      "id": "mark-read-command",
+      "name": "Mark Read",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [700, 280]
+    },
+    {
+      "parameters": {
+        "jsCode": "const stdout = $json.stdout ?? '{}';\nlet parsed;\ntry {\n  parsed = JSON.parse(stdout);\n} catch (e) {\n  parsed = { ok: false, parse_error: String(e), raw: stdout };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "parse-output",
+      "name": "Parse Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, 280]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1160, 280]
+    }
+  ],
+  "connections": {
+    "Mark Read Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize IDs": {
+      "main": [
+        [
+          {
+            "node": "Mark Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Read": {
+      "main": [
+        [
+          {
+            "node": "Parse Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Output": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

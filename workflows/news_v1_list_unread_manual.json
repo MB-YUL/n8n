@@ -1,0 +1,39 @@
+{
+  "name": "News V1 - List Unread (Manual)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [260, 260]
+    },
+    {
+      "parameters": {
+        "command": "node /scripts/news_pipeline.mjs list-unread"
+      },
+      "id": "list-command",
+      "name": "List Unread",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [540, 260]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "List Unread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

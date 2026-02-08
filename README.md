@@ -65,6 +65,46 @@ Import tracked workflow files into a running n8n instance:
 ./scripts/import-workflows.sh
 ```
 
+## News Pipeline (V1, Implemented)
+
+V1 ingestion and unread/read state management are implemented via:
+
+- `scripts/news_pipeline.mjs`
+- `sources/v1_sources.json`
+- `news/index.json`
+
+Commands:
+
+```sh
+# fetch new items from all v1 sources
+node scripts/news_pipeline.mjs fetch
+
+# fetch specific sources
+node scripts/news_pipeline.mjs fetch --source arxiv-cscl,arxiv-cslg
+
+# list unread items
+node scripts/news_pipeline.mjs list-unread
+
+# filter unread by source/date
+node scripts/news_pipeline.mjs list-unread --source openai-blog --date-from 2026-02-01 --date-to 2026-02-08
+
+# mark items as read
+node scripts/news_pipeline.mjs mark-read --id <item_id>
+```
+
+Wrapper scripts:
+
+```sh
+./scripts/news-fetch.sh
+./scripts/news-list-unread.sh
+./scripts/news-mark-read.sh --id <item_id>
+```
+
+Stored files:
+
+- Markdown content: `/news/YYYY/MM/DD/<source_id>__<slug>-<hash12>.md`
+- Status index: `/news/index.json`
+
 ## Troubleshooting
 
 - If `http://localhost:5678` does not load, check:

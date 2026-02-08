@@ -1,0 +1,82 @@
+[
+  {
+    "source_id": "arxiv-cscl",
+    "source_name": "ArXiv (Computation and Language)",
+    "category": "academic",
+    "method": "rss",
+    "url": "https://rss.arxiv.org/rss/cs.CL",
+    "cadence": "6h"
+  },
+  {
+    "source_id": "arxiv-cslg",
+    "source_name": "ArXiv (Machine Learning)",
+    "category": "academic",
+    "method": "rss",
+    "url": "https://rss.arxiv.org/rss/cs.LG",
+    "cadence": "6h"
+  },
+  {
+    "source_id": "openai-blog",
+    "source_name": "OpenAI Blog",
+    "category": "company",
+    "method": "rss",
+    "url": "https://openai.com/news/rss.xml",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "huggingface-blog",
+    "source_name": "Hugging Face Community Blog",
+    "category": "blogs-websites",
+    "method": "rss",
+    "url": "https://huggingface.co/blog/feed.xml",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "importai",
+    "source_name": "Import AI",
+    "category": "newsletters",
+    "method": "rss",
+    "url": "https://importai.substack.com/feed",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "ai-snake-oil",
+    "source_name": "AI Snake Oil",
+    "category": "expert-analyst",
+    "method": "rss",
+    "url": "https://aisnakeoil.substack.com/feed",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "gary-marcus",
+    "source_name": "Marcus on AI",
+    "category": "expert-analyst",
+    "method": "rss",
+    "url": "https://garymarcus.substack.com/feed",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "kdnuggets",
+    "source_name": "KDnuggets",
+    "category": "blogs-websites",
+    "method": "rss",
+    "url": "https://www.kdnuggets.com/feed",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "towards-ai",
+    "source_name": "Towards AI",
+    "category": "blogs-websites",
+    "method": "rss",
+    "url": "https://towardsai.net/feed",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "marktechpost",
+    "source_name": "MarkTechPost",
+    "category": "blogs-websites",
+    "method": "rss",
+    "url": "https://www.marktechpost.com/feed",
+    "cadence": "daily"
+  }
+]

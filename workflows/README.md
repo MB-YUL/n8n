@@ -1,5 +1,21 @@
-Place exported workflow JSON files here.
+This folder stores n8n workflows for the local news pipeline.
 
-Suggested naming:
-- <workflow-name>.json for one-file-per-workflow exports
-- workflows-all.json for full snapshots
+Current workflow files:
+
+- `news_v1_fetch_scheduler.json`
+- `news_v1_fetch_manual.json`
+- `news_v1_list_unread_manual.json`
+- `news_v1_list_unread_webhook.json`
+- `news_v1_mark_read_webhook.json`
+
+Import into n8n:
+
+```sh
+./scripts/import-workflows.sh
+```
+
+Export current n8n workflows:
+
+```sh
+./scripts/export-workflows.sh
+```

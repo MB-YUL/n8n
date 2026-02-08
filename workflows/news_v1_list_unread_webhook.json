@@ -1,0 +1,107 @@
+{
+  "name": "News V1 - List Unread (Webhook)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "news-unread",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-in",
+      "name": "List Unread Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "const q = $json.query ?? {};\nconst cmd = ['node /scripts/news_pipeline.mjs list-unread'];\nif (q.source) cmd.push('--source', q.source);\nif (q.date_from) cmd.push('--date-from', q.date_from);\nif (q.date_to) cmd.push('--date-to', q.date_to);\nreturn [{ json: { command: cmd.join(' ') } }];"
+      },
+      "id": "build-command",
+      "name": "Build Command",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 260]
+    },
+    {
+      "parameters": {
+        "command": "={{$json.command}}"
+      },
+      "id": "run-command",
+      "name": "Run List",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [700, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "const stdout = $json.stdout ?? '{}';\nlet parsed;\ntry {\n  parsed = JSON.parse(stdout);\n} catch (e) {\n  parsed = { ok: false, parse_error: String(e), raw: stdout };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "parse-output",
+      "name": "Parse Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, 260]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1160, 260]
+    }
+  ],
+  "connections": {
+    "List Unread Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Command": {
+      "main": [
+        [
+          {
+            "node": "Run List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run List": {
+      "main": [
+        [
+          {
+            "node": "Parse Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Output": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
