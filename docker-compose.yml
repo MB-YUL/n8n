@@ -17,3 +17,5 @@ services:
     volumes:
       - ./data:/home/node/.n8n
       - ./workflows:/files/workflows
+      - ./sources:/sources
+      - ./news:/news

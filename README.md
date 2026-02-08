@@ -7,6 +7,8 @@ This repository runs n8n locally via Docker and version-controls workflow JSON e
 - `docker-compose.yml`: local n8n runtime
 - `data/`: n8n runtime state (not committed)
 - `workflows/`: committed workflow exports (`.json`)
+- `sources/`: local source files mounted to `/sources` in container
+- `news/`: local news files mounted to `/news` in container
 - `scripts/export-workflows.sh`: export workflows from running n8n
 - `scripts/import-workflows.sh`: import workflows into running n8n
 
