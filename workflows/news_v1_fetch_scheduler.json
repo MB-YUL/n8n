@@ -49,7 +49,7 @@
     },
     {
       "parameters": {
-        "command": "node /scripts/news_pipeline.mjs fetch --source openai-blog,huggingface-blog,importai,ai-snake-oil,gary-marcus,kdnuggets,towards-ai,marktechpost"
+        "command": "node /scripts/news_pipeline.mjs fetch --source openai-blog,huggingface-blog,importai,ai-snake-oil,gary-marcus,kdnuggets,towards-ai,marktechpost,google-ai-blog,microsoft-ai-blog,bair-blog,the-gradient,venturebeat-ai,mit-tech-review-ai"
       },
       "id": "fetch-daily",
       "name": "Fetch Daily Sources",

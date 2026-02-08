@@ -78,5 +78,53 @@
     "method": "rss",
     "url": "https://www.marktechpost.com/feed",
     "cadence": "daily"
+  },
+  {
+    "source_id": "google-ai-blog",
+    "source_name": "Google AI Blog",
+    "category": "company",
+    "method": "rss",
+    "url": "https://blog.google/technology/ai/rss/",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "microsoft-ai-blog",
+    "source_name": "Microsoft AI Blog",
+    "category": "company",
+    "method": "rss",
+    "url": "https://blogs.microsoft.com/ai/feed/",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "bair-blog",
+    "source_name": "BAIR Blog",
+    "category": "blogs-websites",
+    "method": "rss",
+    "url": "https://bair.berkeley.edu/blog/feed.xml",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "the-gradient",
+    "source_name": "The Gradient",
+    "category": "blogs-websites",
+    "method": "rss",
+    "url": "https://thegradient.pub/rss/",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "venturebeat-ai",
+    "source_name": "VentureBeat AI",
+    "category": "blogs-websites",
+    "method": "rss",
+    "url": "https://venturebeat.com/category/ai/feed/",
+    "cadence": "daily"
+  },
+  {
+    "source_id": "mit-tech-review-ai",
+    "source_name": "MIT Technology Review - AI",
+    "category": "industry-reports",
+    "method": "rss",
+    "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed/",
+    "cadence": "daily"
   }
 ]
