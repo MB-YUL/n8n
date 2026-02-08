@@ -1,0 +1,13 @@
+{
+  "action": "create_issue",
+  "protocol_id": "moscow",
+  "questions": [],
+  "issue": {
+    "summary": "MoSCoW — Portail, inscription et profils",
+    "description": "Contexte\n- Objectif: prioriser les fonctionnalités du module.\n\nMoSCoW\nMust Have\n- Inscription & connexion: inscription courriel/mot de passe, connexion/déconnexion, mot de passe oublié.\n- Profils utilisateurs: créer/modifier profil, activer/désactiver compte.\n\nShould Have\n- Gestion de la langue (FR minimal, prêt pour 2e langue).\n- Paramètres de communication.\n\nCould Have\n- Profil public (vitrine), logo, description.\n\nWon’t Have (pour l’instant)\n- Multi-tenant complet multi-MRC depuis la même interface admin.\n\nCritères d’acceptation\n- Les 4 catégories MoSCoW sont présentes et validées.\n- Les éléments “Won’t Have” sont explicitement hors-scope/phase 2+.\n",
+    "labels": ["auto", "moscow"],
+    "components": [],
+    "priority": null,
+    "parentIssueKey": null
+  }
+}

@@ -1,0 +1,11 @@
+# n8n runtime data
+/data/*
+!/data/.gitkeep
+
+# local env overrides
+.env
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

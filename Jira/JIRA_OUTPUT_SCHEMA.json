@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["create_issue", "needs_info"]
+    },
+    "protocol_id": {
+      "type": "string",
+      "enum": ["single_issue", "moscow"]
+    },
+    "questions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 10
+    },
+    "issue": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": { "type": "string", "minLength": 5, "maxLength": 255 },
+        "description": { "type": "string", "minLength": 10 },
+        "labels": { "type": "array", "items": { "type": "string" } },
+        "components": { "type": "array", "items": { "type": "string" } },
+        "priority": { "type": ["string", "null"] },
+        "parentIssueKey": { "type": ["string", "null"] }
+      },
+      "required": ["summary", "description", "labels", "components", "priority", "parentIssueKey"]
+    }
+  },
+  "required": ["action", "protocol_id", "questions", "issue"]
+}
