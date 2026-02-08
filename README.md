@@ -1,49 +1,73 @@
-# n8n Project
+# n8n Local Project
 
-This repository runs n8n locally via Docker and version-controls workflow JSON exports.
+This repo runs n8n locally with Docker and keeps workflow JSON files in Git.
 
-## Project Structure
+## Setup
 
-- `docker-compose.yml`: local n8n runtime
-- `data/`: n8n runtime state (not committed)
-- `workflows/`: committed workflow exports (`.json`)
-- `sources/`: local source files mounted to `/sources` in container
-- `news/`: local news files mounted to `/news` in container
-- `scripts/export-workflows.sh`: export workflows from running n8n
-- `scripts/import-workflows.sh`: import workflows into running n8n
-
-## Quick Start
-
-1. Create local env file:
+1. Create your local env file:
 
 ```sh
 cp .env.example .env
 ```
 
-2. Set a strong `N8N_ENCRYPTION_KEY` in `.env`.
+2. Set a stable encryption key in `.env`:
 
-3. Start n8n:
+```sh
+N8N_ENCRYPTION_KEY=your_long_random_secret
+```
+
+Generate one if needed:
+
+```sh
+openssl rand -hex 32
+```
+
+Important: keep this key unchanged for the same n8n instance, or saved credentials may become unreadable.
+
+## Run n8n
+
+From this folder:
 
 ```sh
 docker compose up -d
 ```
 
-4. Open:
+Open:
 
 - http://localhost:5678
 
-## Workflow Versioning
+Useful commands:
 
-After creating or updating workflows in UI:
+```sh
+docker compose ps
+docker compose logs -f n8n
+docker compose down
+```
+
+## Volumes and Folders
+
+- `./data` -> `/home/node/.n8n` (runtime state, not committed)
+- `./workflows` -> `/files/workflows` (workflow exports, committed)
+- `./sources` -> `/sources` (your source files)
+- `./news` -> `/news` (your news files)
+
+## Workflow Export and Import
+
+Export all workflows to version-controlled JSON files:
 
 ```sh
 ./scripts/export-workflows.sh
-git add workflows
-git commit -m "chore(workflows): export latest flows"
 ```
 
-To load tracked workflows into a fresh local instance:
+Import tracked workflow files into a running n8n instance:
 
 ```sh
 ./scripts/import-workflows.sh
 ```
+
+## Troubleshooting
+
+- If `http://localhost:5678` does not load, check:
+  - `docker compose logs -f n8n`
+  - port `5678` is free
+  - `.env` values are valid
