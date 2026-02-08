@@ -105,6 +105,40 @@ Stored files:
 - Markdown content: `/news/YYYY/MM/DD/<source_id>__<slug>-<hash12>.md`
 - Status index: `/news/index.json`
 
+## Clean Workflow Import
+
+To avoid duplicate `News V1 - ...` workflows in n8n:
+
+```sh
+./scripts/import-workflows-clean.sh
+```
+
+This script:
+
+- backs up `data/database.sqlite`
+- removes existing `News V1 - ...` workflows
+- imports the canonical workflow files once
+
+Use this for re-seeding. For normal day-to-day changes, edit existing workflows in UI, then export.
+
+## Gmail Ingestion Fallback (Phase 2)
+
+Workflow added:
+
+- `News V1 - Ingest Gmail (Trigger)`
+
+It uses:
+
+1. `Gmail Trigger` node (configure Gmail OAuth credential in n8n UI)
+2. `Build Payload` (Code node)
+3. `Ingest Item` (`Execute Command`) calling:
+   - `node /scripts/news_pipeline.mjs ingest-item --payload-b64 ...`
+
+Result:
+
+- New newsletter items from Gmail are stored in `/news/YYYY/MM/DD/*.md`
+- They are added to `/news/index.json` as `status: unread`
+
 ## Troubleshooting
 
 - If `http://localhost:5678` does not load, check:

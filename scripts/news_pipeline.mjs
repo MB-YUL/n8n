@@ -270,6 +270,70 @@ async function commandMarkRead(args) {
   process.stdout.write(`${JSON.stringify({ ok: true, requested: ids.length, updated }, null, 2)}\n`);
 }
 
+async function commandIngestItem(args) {
+  const payloadB64 = args['payload-b64'] ? String(args['payload-b64']) : '';
+  if (!payloadB64) {
+    throw new Error('missing required --payload-b64 <base64_json>');
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString('utf8'));
+  } catch {
+    throw new Error('invalid --payload-b64 value (expected base64 encoded JSON)');
+  }
+
+  const sourceId = payload.source_id || 'gmail-newsletters';
+  const sourceName = payload.source_name || 'Gmail Newsletters';
+  const category = payload.category || 'newsletters';
+  const title = (payload.title || 'Untitled').trim();
+  const url = (payload.url || '').trim() || 'https://mail.google.com/';
+  const publishedAt = isoOrNow(payload.published_at || payload.publishedAt || payload.date);
+  const fetchedAt = new Date().toISOString();
+  const summaryRaw = payload.summary_raw || payload.summary || payload.snippet || '';
+  const contentRaw = payload.content_raw || payload.content || '';
+  const author = payload.author || null;
+  const id = stableId(title, url, publishedAt);
+
+  const index = await readJson(INDEX_PATH, []);
+  if (index.some((item) => item.id === id)) {
+    process.stdout.write(`${JSON.stringify({ ok: true, inserted: 0, duplicate: true, id }, null, 2)}\n`);
+    return;
+  }
+
+  const normalized = {
+    id,
+    source_id: sourceId,
+    source_name: sourceName,
+    category,
+    title,
+    url,
+    published_at: publishedAt,
+    fetched_at: fetchedAt,
+    author,
+    summary_raw: summaryRaw,
+    content_raw: contentRaw,
+    status: 'unread',
+    read_at: null,
+  };
+
+  const { y, m, d } = ymdParts(publishedAt);
+  const dateDir = path.join(NEWS_ROOT, y, m, d);
+  await fs.mkdir(dateDir, { recursive: true });
+
+  const fileName = `${sourceId}__${slugify(title)}-${id.slice(0, 12)}.md`;
+  const absPath = path.join(dateDir, fileName);
+  await fs.writeFile(absPath, markdownFor(normalized), 'utf8');
+
+  normalized.file_path = IS_HOST_LAYOUT ? path.relative(HOST_ROOT, absPath) : absPath;
+  index.push(normalized);
+  await writeJson(INDEX_PATH, index);
+
+  process.stdout.write(
+    `${JSON.stringify({ ok: true, inserted: 1, duplicate: false, id, file_path: normalized.file_path }, null, 2)}\n`,
+  );
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const command = args._[0];
@@ -281,6 +345,7 @@ async function main() {
         '  node scripts/news_pipeline.mjs fetch [--source source_id,source_id2]',
         '  node scripts/news_pipeline.mjs list-unread [--source source_id] [--date-from YYYY-MM-DD] [--date-to YYYY-MM-DD]',
         '  node scripts/news_pipeline.mjs mark-read --id <id[,id2]>',
+        '  node scripts/news_pipeline.mjs ingest-item --payload-b64 <base64_json>',
       ].join('\n') + '\n'
     );
     process.exit(0);
@@ -289,6 +354,7 @@ async function main() {
   if (command === 'fetch') return commandFetch(args);
   if (command === 'list-unread') return commandListUnread(args);
   if (command === 'mark-read') return commandMarkRead(args);
+  if (command === 'ingest-item') return commandIngestItem(args);
 
   throw new Error(`unknown command: ${command}`);
 }

@@ -7,7 +7,7 @@
 ## Scope Locks (Agreed)
 - [x] V1 source scope: 10 reliable RSS/Web sources only.
 - [x] Read/unread model: `index.json` (not markdown frontmatter).
-- [ ] Gmail ingestion: phase 2 (after v1 is stable).
+- [x] Gmail ingestion: phase 2 (after v1 is stable).
 
 ## V1 Sources
 - [x] ArXiv cs.CL (`https://rss.arxiv.org/rss/cs.CL`)
@@ -100,7 +100,7 @@
 
 ## Phase 2 (After V1)
 - [ ] Add remaining sources from `sources/FETCH_STRATEGY.md`.
-- [ ] Add Gmail ingestion fallback for newsletter-only/gated sources.
+- [x] Add Gmail ingestion fallback for newsletter-only/gated sources.
 - [ ] Add optional digest flow for unread items.
 - [ ] Add richer query filters (keywords, source groups, date windows).
 
