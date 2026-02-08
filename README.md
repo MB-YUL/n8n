@@ -126,6 +126,7 @@ Use this for re-seeding. For normal day-to-day changes, edit existing workflows 
 Workflow added:
 
 - `News V1 - Ingest Gmail (Trigger)`
+- `News V1 - Newsletter Onboarding (Manual)`
 
 It uses:
 
@@ -138,6 +139,13 @@ Result:
 
 - New newsletter items from Gmail are stored in `/news/YYYY/MM/DD/*.md`
 - They are added to `/news/index.json` as `status: unread`
+- Ingest execution output is now parsed into structured JSON (no escaped `stdout` blob)
+
+Newsletter onboarding helper:
+
+- Run `News V1 - Newsletter Onboarding (Manual)` to get a prioritized list of newsletter signup URLs.
+- Use `recursifai@gmail.com` to subscribe.
+- The flow probes each signup URL and returns `probe_status_code`/`probe_ok` for quick validation.
 
 ## Troubleshooting
 

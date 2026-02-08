@@ -22,3 +22,6 @@
 - Do **not** run `./scripts/import-workflows.sh` repeatedly on an already-seeded instance.
 - When re-seeding locally, use `./scripts/import-workflows-clean.sh` to wipe old `News V1 - ...` workflows first, then import once.
 - Before any destructive cleanup, ensure a SQLite backup exists (the clean import script does this automatically).
+
+# REFERENCE ACCOUNTS
+- Primary n8n/Gmail reference account for newsletter ingestion and automation setup: `recursifai@gmail.com`

@@ -8,6 +8,7 @@ Current workflow files:
 - `news_v1_list_unread_webhook.json`
 - `news_v1_mark_read_webhook.json`
 - `news_v1_ingest_gmail_trigger.json`
+- `news_v1_newsletter_onboarding_manual.json`
 
 Import into n8n:
 

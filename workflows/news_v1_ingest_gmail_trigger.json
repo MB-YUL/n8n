@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const headers = $json.payload?.headers ?? [];\nconst headerMap = Object.fromEntries(headers.map(h => [String(h.name || '').toLowerCase(), h.value]));\nconst subject = $json.subject || headerMap.subject || $json.snippet || 'Newsletter item';\nconst dateValue = $json.internalDate || headerMap.date || $json.date || new Date().toISOString();\nconst publishedAt = Number.isFinite(Number(dateValue))\n  ? new Date(Number(dateValue)).toISOString()\n  : new Date(dateValue).toISOString();\nconst messageId = $json.id || $json.messageId || headerMap['message-id'] || String(Date.now());\nconst payload = {\n  source_id: 'gmail-newsletters',\n  source_name: 'Gmail Newsletters',\n  category: 'newsletters',\n  title: subject,\n  url: `https://mail.google.com/mail/u/0/#all/${messageId}`,\n  published_at: Number.isNaN(Date.parse(publishedAt)) ? new Date().toISOString() : publishedAt,\n  author: headerMap.from || null,\n  summary_raw: $json.snippet || '',\n  content_raw: $json.textPlain || ''\n};\nconst payloadB64 = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64');\nreturn [{ json: { payloadB64, payload } }];"
+        "jsCode": "function decodeHtml(text) {\n  return String(text || '')\n    .replaceAll('&amp;', '&')\n    .replaceAll('&lt;', '<')\n    .replaceAll('&gt;', '>')\n    .replaceAll('&quot;', '\"')\n    .replaceAll('&#39;', \"'\")\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nconst headers = $json.payload?.headers ?? [];\nconst headerMap = Object.fromEntries(headers.map((header) => [String(header.name || '').toLowerCase(), header.value]));\nconst rawSubject = $json.subject || headerMap.subject || '';\nconst fallbackTitle = decodeHtml($json.snippet || 'Newsletter item').split(' ').slice(0, 12).join(' ');\nconst subject = decodeHtml(rawSubject || fallbackTitle || 'Newsletter item');\n\nconst dateValue = $json.internalDate || headerMap.date || $json.date || new Date().toISOString();\nconst publishedAt = Number.isFinite(Number(dateValue))\n  ? new Date(Number(dateValue)).toISOString()\n  : new Date(dateValue).toISOString();\n\nconst messageId = $json.id || $json.messageId || headerMap['message-id'] || String(Date.now());\nconst payload = {\n  source_id: 'gmail-newsletters',\n  source_name: 'Gmail Newsletters',\n  category: 'newsletters',\n  title: subject,\n  url: `https://mail.google.com/mail/u/0/#all/${messageId}`,\n  published_at: Number.isNaN(Date.parse(publishedAt)) ? new Date().toISOString() : publishedAt,\n  author: decodeHtml(headerMap.from || '' ) || null,\n  summary_raw: decodeHtml($json.snippet || ''),\n  content_raw: decodeHtml($json.textPlain || '')\n};\n\nconst payloadB64 = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64');\nreturn [{ json: { payloadB64, payload } }];"
       },
       "id": "build-payload",
       "name": "Build Payload",
@@ -36,6 +36,16 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [790, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "const stdout = String($json.stdout || '{}');\nlet parsed;\n\ntry {\n  parsed = JSON.parse(stdout);\n} catch {\n  parsed = { ok: false, parse_error: 'Unable to parse ingest stdout', raw: stdout };\n}\n\nreturn [{ json: parsed }];"
+      },
+      "id": "parse-result",
+      "name": "Parse Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 260]
     }
   ],
   "connections": {
@@ -55,6 +65,17 @@
         [
           {
             "node": "Ingest Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingest Item": {
+      "main": [
+        [
+          {
+            "node": "Parse Result",
             "type": "main",
             "index": 0
           }
