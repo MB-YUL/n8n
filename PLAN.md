@@ -101,9 +101,10 @@
 ## Phase 2 (After V1)
 - [ ] Add remaining sources from `sources/FETCH_STRATEGY.md`.
 - [x] Add Gmail ingestion fallback for newsletter-only/gated sources.
+- [x] Add newsletter onboarding flow with canonical targets and subscriber identity (`Recursif AI <recursifai@gmail.com>`).
 - [ ] Add optional digest flow for unread items.
 - [ ] Add richer query filters (keywords, source groups, date windows).
 
 ## Execution Notes
 - [x] Keep this file updated during implementation by checking off completed tasks.
-- [ ] Commit in small steps (workflows, storage contract, unread/read operations, tests).
+- [x] Commit in small steps (workflows, storage contract, unread/read operations, tests).

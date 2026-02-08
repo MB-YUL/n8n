@@ -11,13 +11,22 @@ cp "$DB_PATH" "$BACKUP_PATH"
 echo "Backup created: $BACKUP_PATH"
 
 sqlite3 "$DB_PATH" <<'SQL'
-PRAGMA foreign_keys=ON;
+PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 DROP TABLE IF EXISTS __wf_ids;
 CREATE TEMP TABLE __wf_ids AS
 SELECT id FROM workflow_entity WHERE name LIKE 'News V1 - %';
 
+DELETE FROM chat_hub_messages WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM chat_hub_sessions WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM execution_entity WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM insights_metadata WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM processed_data WHERE workflowId IN (SELECT id FROM __wf_ids);
 DELETE FROM shared_workflow WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM test_run WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM webhook_entity WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM workflow_dependency WHERE workflowId IN (SELECT id FROM __wf_ids);
+DELETE FROM workflows_tags WHERE workflowId IN (SELECT id FROM __wf_ids);
 DELETE FROM workflow_statistics WHERE workflowId IN (SELECT id FROM __wf_ids);
 DELETE FROM workflow_publish_history WHERE workflowId IN (SELECT id FROM __wf_ids);
 DELETE FROM workflow_history WHERE workflowId IN (SELECT id FROM __wf_ids);
@@ -25,6 +34,7 @@ DELETE FROM workflow_entity WHERE id IN (SELECT id FROM __wf_ids);
 
 DROP TABLE __wf_ids;
 COMMIT;
+PRAGMA foreign_keys=ON;
 SQL
 
 docker compose restart n8n >/dev/null

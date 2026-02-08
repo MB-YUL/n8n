@@ -11,7 +11,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const newsletters = [\n  { id: 'the-rundown-ai', name: 'The Rundown AI', signup_url: 'https://www.therundown.ai/', rss_url: null },\n  { id: 'bens-bites', name: 'Ben\\'s Bites', signup_url: 'https://www.bensbites.com/', rss_url: null },\n  { id: 'superhuman-ai', name: 'Superhuman AI', signup_url: 'https://www.superhuman.ai/', rss_url: null },\n  { id: 'import-ai', name: 'Import AI', signup_url: 'https://importai.substack.com/', rss_url: 'https://importai.substack.com/feed' },\n  { id: 'ai-snake-oil', name: 'AI Snake Oil', signup_url: 'https://aisnakeoil.substack.com/', rss_url: 'https://aisnakeoil.substack.com/feed' },\n  { id: 'gary-marcus', name: 'Marcus on AI', signup_url: 'https://garymarcus.substack.com/', rss_url: 'https://garymarcus.substack.com/feed' },\n  { id: 'the-batch', name: 'The Batch', signup_url: 'https://www.deeplearning.ai/the-batch/', rss_url: null },\n  { id: 'tldr-ai', name: 'TLDR AI', signup_url: 'https://tldr.tech/ai', rss_url: null },\n  { id: 'alphasignal', name: 'AlphaSignal', signup_url: 'https://alphasignal.ai/', rss_url: null },\n  { id: 'chain-of-thought', name: 'Chain of Thought (Every)', signup_url: 'https://every.to/chain-of-thought', rss_url: null }\n];\n\nreturn newsletters.map((item, index) => ({\n  json: {\n    rank: index + 1,\n    ...item,\n    action: 'Open signup_url and subscribe with recursifai@gmail.com',\n    notes: item.rss_url ? 'RSS already usable; email signup optional but recommended' : 'No reliable public RSS; use Gmail subscription for ingestion fallback'\n  }\n}));"
+        "jsCode": "const subscriber = {\n  name: 'Recursif AI',\n  email: 'recursifai@gmail.com'\n};\n\nconst newsletters = [\n  { id: 'the-rundown-ai', name: 'The Rundown AI', signup_url: 'https://www.therundown.ai/', rss_url: null },\n  { id: 'bens-bites', name: 'Ben\\'s Bites', signup_url: 'https://www.bensbites.com/', rss_url: null },\n  { id: 'superhuman-ai', name: 'Superhuman AI', signup_url: 'https://www.superhuman.ai/', rss_url: null },\n  { id: 'import-ai', name: 'Import AI', signup_url: 'https://importai.substack.com/', rss_url: 'https://importai.substack.com/feed' },\n  { id: 'ai-snake-oil', name: 'AI Snake Oil', signup_url: 'https://aisnakeoil.substack.com/', rss_url: 'https://aisnakeoil.substack.com/feed' },\n  { id: 'gary-marcus', name: 'Marcus on AI', signup_url: 'https://garymarcus.substack.com/', rss_url: 'https://garymarcus.substack.com/feed' },\n  { id: 'the-batch', name: 'The Batch', signup_url: 'https://www.deeplearning.ai/the-batch/', rss_url: null },\n  { id: 'tldr-ai', name: 'TLDR AI', signup_url: 'https://tldr.tech/ai', rss_url: null },\n  { id: 'alphasignal', name: 'AlphaSignal', signup_url: 'https://alphasignal.ai/', rss_url: null },\n  { id: 'chain-of-thought', name: 'Chain of Thought (Every)', signup_url: 'https://every.to/chain-of-thought', rss_url: null }\n];\n\nreturn newsletters.map((item, index) => ({\n  json: {\n    rank: index + 1,\n    ...item,\n    subscriber_name: subscriber.name,\n    subscriber_email: subscriber.email,\n    action: `Open signup_url and subscribe with ${subscriber.name} <${subscriber.email}>`,\n    notes: item.rss_url ? 'RSS already usable; email signup optional but recommended' : 'No reliable public RSS; use Gmail subscription for ingestion fallback'\n  }\n}));"
       },
       "id": "build-targets",
       "name": "Build Newsletter Targets",
@@ -21,11 +21,12 @@
     },
     {
       "parameters": {
+        "method": "HEAD",
         "url": "={{$json.signup_url}}",
         "options": {
           "response": {
             "response": {
-              "responseFormat": "text"
+              "responseFormat": "json"
             }
           }
         }
@@ -39,7 +40,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.all();\nreturn input.map((item) => {\n  const statusCode = item.json.statusCode || null;\n  const ok = typeof statusCode === 'number' ? (statusCode >= 200 && statusCode < 400) : false;\n  return {\n    json: {\n      rank: item.json.rank,\n      id: item.json.id,\n      name: item.json.name,\n      signup_url: item.json.signup_url,\n      rss_url: item.json.rss_url,\n      action: item.json.action,\n      notes: item.json.notes,\n      probe_status_code: statusCode,\n      probe_ok: ok\n    }\n  };\n});"
+        "jsCode": "const probes = $input.all();\nconst targets = $items('Build Newsletter Targets', 0);\n\nreturn probes.map((item, index) => {\n  const target = targets[index]?.json ?? {};\n  const data = item.json || {};\n  const statusCode = data.statusCode ?? item.error?.statusCode ?? null;\n  const ok = typeof statusCode === 'number' ? (statusCode >= 200 && statusCode < 400) : false;\n\n  return {\n    json: {\n      rank: target.rank ?? index + 1,\n      id: target.id ?? null,\n      name: target.name ?? null,\n      signup_url: target.signup_url ?? null,\n      rss_url: target.rss_url ?? null,\n      subscriber_name: target.subscriber_name ?? 'Recursif AI',\n      subscriber_email: target.subscriber_email ?? 'recursifai@gmail.com',\n      action: target.action ?? 'Open signup_url and subscribe manually',\n      notes: target.notes ?? 'Probe failed; open signup_url manually',\n      probe_status_code: statusCode,\n      probe_ok: ok,\n      probe_error: item.error?.message ?? null\n    }\n  };\n});"
       },
       "id": "format-output",
       "name": "Format Output",
