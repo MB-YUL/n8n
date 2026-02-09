@@ -1,0 +1,70 @@
+{
+  "name": "News V1 - Digest (Scheduler)",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyDay",
+              "hour": 8,
+              "minute": 30
+            }
+          ]
+        }
+      },
+      "id": "cron-digest",
+      "name": "Every Day 08:30",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 260]
+    },
+    {
+      "parameters": {
+        "command": "node /scripts/news_pipeline.mjs build-digest --max-items 40"
+      },
+      "id": "build-digest",
+      "name": "Build Digest",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [520, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "const stdout = String($json.stdout || '{}');\nlet parsed;\ntry {\n  parsed = JSON.parse(stdout);\n} catch {\n  parsed = { ok: false, parse_error: 'Unable to parse digest output', raw: stdout };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "parse-digest",
+      "name": "Parse Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 260]
+    }
+  ],
+  "connections": {
+    "Every Day 08:30": {
+      "main": [
+        [
+          {
+            "node": "Build Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Digest": {
+      "main": [
+        [
+          {
+            "node": "Parse Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

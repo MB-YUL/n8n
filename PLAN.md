@@ -102,7 +102,7 @@
 - [ ] Add remaining sources from `sources/FETCH_STRATEGY.md`.
 - [x] Add Gmail ingestion fallback for newsletter-only/gated sources.
 - [x] Add newsletter onboarding flow with canonical targets and subscriber identity (`Recursif AI <recursifai@gmail.com>`).
-- [ ] Add optional digest flow for unread items.
+- [x] Add optional digest flow for unread items.
 - [ ] Add richer query filters (keywords, source groups, date windows).
 
 ## Execution Notes

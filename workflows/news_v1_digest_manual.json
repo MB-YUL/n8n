@@ -1,0 +1,60 @@
+{
+  "name": "News V1 - Digest (Manual)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 260]
+    },
+    {
+      "parameters": {
+        "command": "node /scripts/news_pipeline.mjs build-digest --max-items 40"
+      },
+      "id": "build-digest",
+      "name": "Build Digest",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [520, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "const stdout = String($json.stdout || '{}');\nlet parsed;\ntry {\n  parsed = JSON.parse(stdout);\n} catch {\n  parsed = { ok: false, parse_error: 'Unable to parse digest output', raw: stdout };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "parse-digest",
+      "name": "Parse Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 260]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Digest": {
+      "main": [
+        [
+          {
+            "node": "Parse Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

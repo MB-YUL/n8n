@@ -334,6 +334,128 @@ async function commandIngestItem(args) {
   );
 }
 
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toISOString().slice(0, 10);
+}
+
+function sectionTitle(category) {
+  if (category === 'academic') return 'Research';
+  if (category === 'company') return 'Company';
+  if (category === 'newsletters') return 'Newsletters';
+  if (category === 'expert-analyst') return 'Expert & Analyst';
+  if (category === 'industry-reports') return 'Industry';
+  return 'General';
+}
+
+async function commandBuildDigest(args) {
+  const index = await readJson(INDEX_PATH, []);
+  const maxItems = Number(args['max-items'] || 40);
+  const unread = index
+    .filter((item) => item.status === 'unread')
+    .sort((a, b) => b.published_at.localeCompare(a.published_at))
+    .slice(0, Number.isFinite(maxItems) && maxItems > 0 ? maxItems : 40);
+
+  const top = unread.slice(0, Math.min(5, unread.length));
+  const grouped = new Map();
+  for (const item of unread) {
+    const key = item.category || 'general';
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(item);
+  }
+
+  const generatedAt = new Date().toISOString();
+  const dateLabel = generatedAt.slice(0, 10);
+  const total = unread.length;
+  const subject = `Recursif AI Digest - ${dateLabel} (${total} unread)`;
+
+  const md = [];
+  md.push(`# ${subject}`);
+  md.push('');
+  md.push(`Generated: ${generatedAt}`);
+  md.push('');
+  md.push(`Total unread included: ${total}`);
+  md.push('');
+  md.push('## Top 5');
+  md.push('');
+  if (!top.length) {
+    md.push('No unread items.');
+    md.push('');
+  } else {
+    for (const item of top) {
+      md.push(`- [${item.title}](${item.url})`);
+      md.push(`  - ${item.source_name} | ${fmtDate(item.published_at)} | ${item.category}`);
+    }
+    md.push('');
+  }
+
+  const sortedCategories = [...grouped.keys()].sort();
+  for (const category of sortedCategories) {
+    const items = grouped.get(category);
+    md.push(`## ${sectionTitle(category)}`);
+    md.push('');
+    for (const item of items) {
+      md.push(`- [${item.title}](${item.url})`);
+      md.push(`  - ${item.source_name} | ${fmtDate(item.published_at)}`);
+    }
+    md.push('');
+  }
+
+  const html = [];
+  html.push(`<h1>${escapeHtml(subject)}</h1>`);
+  html.push(`<p><strong>Generated:</strong> ${escapeHtml(generatedAt)}</p>`);
+  html.push(`<p><strong>Total unread included:</strong> ${total}</p>`);
+  html.push('<h2>Top 5</h2>');
+  if (!top.length) {
+    html.push('<p>No unread items.</p>');
+  } else {
+    html.push('<ul>');
+    for (const item of top) {
+      html.push(
+        `<li><a href="${escapeHtml(item.url)}">${escapeHtml(item.title)}</a> - ${escapeHtml(item.source_name)} | ${escapeHtml(fmtDate(item.published_at))} | ${escapeHtml(item.category || '')}</li>`,
+      );
+    }
+    html.push('</ul>');
+  }
+  for (const category of sortedCategories) {
+    const items = grouped.get(category);
+    html.push(`<h2>${escapeHtml(sectionTitle(category))}</h2>`);
+    html.push('<ul>');
+    for (const item of items) {
+      html.push(
+        `<li><a href="${escapeHtml(item.url)}">${escapeHtml(item.title)}</a> - ${escapeHtml(item.source_name)} | ${escapeHtml(fmtDate(item.published_at))}</li>`,
+      );
+    }
+    html.push('</ul>');
+  }
+
+  process.stdout.write(
+    `${JSON.stringify(
+      {
+        ok: true,
+        generated_at: generatedAt,
+        count: total,
+        subject,
+        ids: unread.map((x) => x.id),
+        markdown: md.join('\n'),
+        html: html.join('\n'),
+      },
+      null,
+      2,
+    )}\n`,
+  );
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const command = args._[0];
@@ -346,6 +468,7 @@ async function main() {
         '  node scripts/news_pipeline.mjs list-unread [--source source_id] [--date-from YYYY-MM-DD] [--date-to YYYY-MM-DD]',
         '  node scripts/news_pipeline.mjs mark-read --id <id[,id2]>',
         '  node scripts/news_pipeline.mjs ingest-item --payload-b64 <base64_json>',
+        '  node scripts/news_pipeline.mjs build-digest [--max-items N]',
       ].join('\n') + '\n'
     );
     process.exit(0);
@@ -355,6 +478,7 @@ async function main() {
   if (command === 'list-unread') return commandListUnread(args);
   if (command === 'mark-read') return commandMarkRead(args);
   if (command === 'ingest-item') return commandIngestItem(args);
+  if (command === 'build-digest') return commandBuildDigest(args);
 
   throw new Error(`unknown command: ${command}`);
 }

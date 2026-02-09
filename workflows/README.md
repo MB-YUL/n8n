@@ -4,6 +4,8 @@ Current workflow files:
 
 - `news_v1_fetch_scheduler.json`
 - `news_v1_fetch_manual.json`
+- `news_v1_digest_scheduler.json`
+- `news_v1_digest_manual.json`
 - `news_v1_list_unread_manual.json`
 - `news_v1_list_unread_webhook.json`
 - `news_v1_mark_read_webhook.json`
