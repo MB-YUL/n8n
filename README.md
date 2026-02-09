@@ -51,6 +51,8 @@ docker compose down
 - `./sources` -> `/sources` (your source files)
 - `./news` -> `/news` (your news files)
 
+News flow usage and source/subscription details are documented in `news/README.md`.
+
 ## Workflow Export and Import
 
 Export all workflows to version-controlled JSON files:
