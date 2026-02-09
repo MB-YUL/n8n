@@ -28,6 +28,27 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [800, 260]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "recursifai@gmail.com",
+        "subject": "={{$json.subject}}",
+        "emailType": "html",
+        "message": "={{$json.html}}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Recursif AI"
+        }
+      },
+      "id": "send-digest-email",
+      "name": "Send Digest Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [1080, 260],
+      "continueOnFail": true
     }
   ],
   "connections": {
@@ -47,6 +68,17 @@
         [
           {
             "node": "Parse Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Digest": {
+      "main": [
+        [
+          {
+            "node": "Send Digest Email",
             "type": "main",
             "index": 0
           }
